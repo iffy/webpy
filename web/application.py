@@ -118,6 +118,17 @@ class application:
             del t._d
     
     def add_mapping(self, pattern, classname):
+        """
+        Adds a mapping to the application.
+        
+            >>> app = application((), globals())
+            >>> class echo:
+            ...   def GET(self, name): return 'echo: ' + name
+            ... 
+            >>> app.add_mapping('/(.*)', 'echo')
+            >>> app.request('/something').data
+            'echo: something'
+        """
         self.mapping += (pattern, classname)
         
     def add_processor(self, processor):
