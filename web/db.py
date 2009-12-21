@@ -442,11 +442,19 @@ class Transaction:
             self.ctx.transactions = self.ctx.transactions[:self.transaction_count]
 
 class DB: 
-    """Database"""
+    """Database driver"""
     def __init__(self, db_module, keywords):
-        """Creates a database.
         """
-        # some DB implementaions take optional paramater `driver` to use a specific driver modue
+        Creates a database driver.
+        
+        db_module       database module (e.g. sqlite3, psycopg2)
+        keywords        dict of keywords passed to db_module.connect()
+        
+        Special keywords:
+            driver      always removed from the keywords list
+            pooling     boolean indicating whether to use pooling or not
+        """
+        # some DB implementaions take optional paramater `driver` to use a specific driver module
         # but it should not be passed to connect
         keywords.pop('driver', None)
 
@@ -868,6 +876,18 @@ class DB:
 class PostgresDB(DB): 
     """Postgres driver."""
     def __init__(self, **keywords):
+        """
+        Creates a Postgres driver.
+        
+        Tries to use psycopg2, psycopg, pgdb in that order.  Can be overriden
+        with the "driver" keyword.
+        
+        Special keywords:
+            pw          Alias for password.
+            driver      One of "psycopg2" "psycopg" "pgdb"
+            db          Alias for database.  Defaults to the PGDATABASE
+                        environment variable.
+        """
         if 'pw' in keywords:
             keywords['password'] = keywords.pop('pw')
             
@@ -950,6 +970,17 @@ def import_driver(drivers, preferred=None):
 
 class SqliteDB(DB): 
     def __init__(self, **keywords):
+        """
+        Creates an SQLite driver.
+        
+        Tries to use sqlite3, pysqlite2.dbapi2, sqlite in that order.  Can be overriden
+        with the "driver" keyword.
+        
+        Special keywords:
+            driver      One of "sqlite3" "pysqlite2.dbapi2" "sqlite"
+            db          Alias for database.  Defaults to the PGDATABASE
+                        environment variable.
+        """
         db = import_driver(["sqlite3", "pysqlite2.dbapi2", "sqlite"], preferred=keywords.pop('driver', None))
 
         if db.__name__ in ["sqlite3", "pysqlite2.dbapi2"]:

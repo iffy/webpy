@@ -1,2 +1,5 @@
 *.pyc
 .DS_Store
+/build
+test/foo.py
+test/webpy.db
