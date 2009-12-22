@@ -182,6 +182,8 @@ class DiskStore(Store):
         >>> s['a'] = 'foo'
         >>> s['a']
         'foo'
+        >>> s.get('a')
+        'foo'
         >>> time.sleep(0.01)
         >>> s.cleanup(0.01)
         >>> s['a']
@@ -229,6 +231,12 @@ class DiskStore(Store):
         if os.path.exists(path):
             os.remove(path)
     
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+    
     def cleanup(self, timeout):
         now = time.time()
         for f in os.listdir(self.root):
@@ -259,7 +267,7 @@ class DBStore(Store):
             s = self.db.select(self.table, where="session_id=$key", vars=locals())[0]
             self.db.update(self.table, where="session_id=$key", atime=now, vars=locals())
         except IndexError:
-            raise KeyError
+            raise KeyError, key
         else:
             return self.decode(s.data)
 
@@ -273,6 +281,12 @@ class DBStore(Store):
                 
     def __delitem__(self, key):
         self.db.delete(self.table, where="session_id=$key", vars=locals())
+    
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
 
     def cleanup(self, timeout):
         timeout = datetime.timedelta(timeout/(24.0*60*60)) #timedelta takes numdays as arg

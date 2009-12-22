@@ -1,2 +1,4 @@
 *.pyc
 .DS_Store
+foo.py
+webpy.db
