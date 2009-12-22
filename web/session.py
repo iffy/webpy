@@ -38,10 +38,20 @@ class SessionExpired(web.HTTPError):
         web.HTTPError.__init__(self, '200 OK', {}, data=message)
 
 class Session(utils.ThreadedDict):
-    """Session management for web.py
+    """
+    Session management for web.py
     """
 
     def __init__(self, app, store, initializer=None):
+        """
+        Creates a Session.
+        
+        app             application object
+        store           data store object that will be used to hold session data
+        initializer     Either a dict or a method.  Methods are called on 
+                        session load.  Dicts are used to update this object
+                        on session load.
+        """
         self.__dict__['store'] = store
         self.__dict__['_initializer'] = initializer
         self.__dict__['_last_cleanup_time'] = 0
@@ -238,7 +248,8 @@ class DiskStore(Store):
                 os.remove(path)
 
 class DBStore(Store):
-    """Store for saving a session in database
+    """
+    Store for saving a session in database.
     Needs a table with the following columns:
 
         session_id CHAR(128) UNIQUE NOT NULL,
