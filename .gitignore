@@ -3,3 +3,5 @@
 /build
 test/foo.py
 test/webpy.db
+foo.py
+webpy.db
